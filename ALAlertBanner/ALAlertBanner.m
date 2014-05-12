@@ -39,7 +39,7 @@ static NSString * const kShowAlertBannerKey = @"showAlertBannerKey";
 static NSString * const kHideAlertBannerKey = @"hideAlertBannerKey";
 static NSString * const kMoveAlertBannerKey = @"moveAlertBannerKey";
 
-static CGFloat const kMargin = 10.f;
+static CGFloat const kMargin = 15.f;
 static CGFloat const kNavigationBarHeightDefault = 44.f;
 static CGFloat const kNavigationBarHeightiOS7Landscape = 32.f;
 
@@ -157,7 +157,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     _hideAnimationDuration = 0.2;
     _isScheduledToHide = NO;
     _bannerOpacity = 0.93f;
-    _secondsToShow = 3.5;
+    _secondsToShow = 4;
     _allowTapToDismiss = YES;
     _shouldForceHide = NO;
     
@@ -171,7 +171,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     
     _titleLabel = [[UILabel alloc] init];
     _titleLabel.backgroundColor = [UIColor clearColor];
-    _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13.f];
+    _titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14.f];
     _titleLabel.textColor = [UIColor colorWithWhite:1.f alpha:0.9f];
     _titleLabel.textAlignment = NSTextAlignmentLeft;
     _titleLabel.numberOfLines = 1;
@@ -184,7 +184,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     
     _subtitleLabel = [[UILabel alloc] init];
     _subtitleLabel.backgroundColor = [UIColor clearColor];
-    _subtitleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:10.f];
+    _subtitleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:14.f];
     _subtitleLabel.textColor = [UIColor colorWithWhite:1.f alpha:0.9f];
     _subtitleLabel.textAlignment = NSTextAlignmentLeft;
     _subtitleLabel.numberOfLines = 0;
@@ -712,20 +712,8 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
             break;
     }
     
-    NSArray *colorsArray = [NSArray arrayWithObjects:(id)[fillColor CGColor], (id)[[fillColor darkerColor] CGColor], nil];
-    CGColorSpaceRef colorSpace =  CGColorSpaceCreateDeviceRGB();
-    const CGFloat locations[2] = {0.f, 1.f};
-    CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)colorsArray, locations);
-    
-    CGContextDrawLinearGradient(context, gradient, CGPointZero, CGPointMake(0.f, self.bounds.size.height), 0.f);
-    
-    CGGradientRelease(gradient);
-    CGColorSpaceRelease(colorSpace);
-    
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.6f].CGColor);
-    CGContextFillRect(context, CGRectMake(0.f, rect.size.height - 1.f, rect.size.width, 1.f));
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:1.f green:1.f blue:1.f alpha:0.3f].CGColor);
-    CGContextFillRect(context, CGRectMake(0.f, 0.f, rect.size.width, 1.f));
+    CGContextSetFillColorWithColor(context, fillColor.CGColor);
+    CGContextFillRect(context, rect);
 }
 
 - (id)nextAvailableViewController:(id)view {
