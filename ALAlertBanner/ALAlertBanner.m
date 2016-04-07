@@ -1,19 +1,19 @@
 /**
  ALAlertBanner.m
-
+ 
  Created by Anthony Lobianco on 8/12/13.
  Copyright (c) 2013 Anthony Lobianco. All rights reserved.
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
  the Software without restriction, including without limitation the rights to
  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
  the Software, and to permit persons to whom the Software is furnished to do so,
  subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -49,20 +49,6 @@ static CFTimeInterval const kRotationDurationIPad = 0.4;
 static CGFloat const kForceHideAnimationDuration = 0.1f;
 
 #define AL_DEVICE_ANIMATION_DURATION UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? kRotationDurationIPad : kRotationDurationIphone;
-
-//macros referenced from MBProgressHUD. cheers to @matej
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 70000
-    #define AL_SINGLELINE_TEXT_HEIGHT(text, font) [text length] > 0 ? [text sizeWithAttributes:nil].height : 0.f;
-    #define AL_MULTILINE_TEXT_HEIGHT(text, font, maxSize, mode) [text length] > 0 ? [text boundingRectWithSize:maxSize \
-                                                                                                       options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading) \
-                                                                                                    attributes:nil \
-                                                                                                       context:NULL].size.height : 0.f;
-#else
-    #define AL_SINGLELINE_TEXT_HEIGHT(text, font) [text length] > 0 ? [text sizeWithFont:font].height : 0.f;
-    #define AL_MULTILINE_TEXT_HEIGHT(text, font, maxSize, mode) [text length] > 0 ? [text sizeWithFont:font \
-                                                                                     constrainedToSize:maxSize \
-                                                                                         lineBreakMode:mode].height : 0.f;
-#endif
 
 # pragma mark -
 # pragma mark Helper Categories
@@ -104,13 +90,13 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 }
 
 + (CGFloat)statusBarHeight {
-	return [UIApplication sharedApplication].statusBarFrame.size.height;
+    return [UIApplication sharedApplication].statusBarFrame.size.height;
 }
 
 @end
 
 @interface ALAlertBanner () {
-    @private
+@private
     ALAlertBannerManager *manager;
 }
 
@@ -501,7 +487,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 # pragma mark -
 # pragma mark Private Methods
 
-- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {    
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
     if ([[anim valueForKey:@"anim"] isEqualToString:kShowAlertBannerKey] && flag) {
         [self.delegate alertBannerDidShow:self inView:self.superview];
         self.state = ALAlertBannerStateVisible;
@@ -531,9 +517,9 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     BOOL isSuperviewKindOfWindow = ([superview isKindOfClass:[UIWindow class]]);
     
     CGSize maxLabelSize = CGSizeMake(superview.bounds.size.width - (kMargin*3) - self.styleImageView.image.size.width, CGFLOAT_MAX);
-    CGFloat titleLabelHeight = AL_SINGLELINE_TEXT_HEIGHT(self.titleLabel.text, self.titleLabel.font);
-    CGFloat subtitleLabelHeight = AL_MULTILINE_TEXT_HEIGHT(self.subtitleLabel.text, self.subtitleLabel.font, maxLabelSize, self.subtitleLabel.lineBreakMode);
-    CGFloat heightForSelf = titleLabelHeight + subtitleLabelHeight + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2 : kMargin*2.5);
+    CGSize titleLabelSize = [self.titleLabel sizeThatFits:maxLabelSize];
+    CGSize subtitleLabelSize = [self.subtitleLabel sizeThatFits:maxLabelSize];
+    CGFloat heightForSelf = titleLabelSize.height + subtitleLabelSize.height + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2 : kMargin*2.5);
     
     CGRect frame = CGRectMake(0.f, 0.f, superview.bounds.size.width, heightForSelf);
     CGFloat initialYCoord = 0.f;
@@ -577,13 +563,18 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 }
 
 - (void)updateSizeAndSubviewsAnimated:(BOOL)animated {
-    CGSize maxLabelSize = CGSizeMake(self.superview.bounds.size.width - (kMargin*3.f) - self.styleImageView.image.size.width, CGFLOAT_MAX);
-    CGFloat titleLabelHeight = AL_SINGLELINE_TEXT_HEIGHT(self.titleLabel.text, self.titleLabel.font);
-    CGFloat subtitleLabelHeight = AL_MULTILINE_TEXT_HEIGHT(self.subtitleLabel.text, self.subtitleLabel.font, maxLabelSize, self.subtitleLabel.lineBreakMode);
-    CGFloat heightForSelf = titleLabelHeight + subtitleLabelHeight + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2.f : kMargin*2.5f);
+    CGSize maxLabelSize = CGSizeMake(self.superview.bounds.size.width - (kMargin*3) - self.styleImageView.image.size.width, CGFLOAT_MAX);
+    CGSize titleLabelSize = [self.titleLabel sizeThatFits:maxLabelSize];
+    CGSize subtitleLabelSize = [self.subtitleLabel sizeThatFits:maxLabelSize];
+    CGFloat heightForSelf = titleLabelSize.height + subtitleLabelSize.height + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2 : kMargin*2.5);
     
+    
+    //    CGFloat titleLabelHeight = AL_SINGLELINE_TEXT_HEIGHT(self.titleLabel.text, self.titleLabel.font);
+    //    CGFloat subtitleLabelHeight = AL_MULTILINE_TEXT_HEIGHT(self.subtitleLabel.text, self.subtitleLabel.font, maxLabelSize, self.subtitleLabel.lineBreakMode);
+    //    CGFloat heightForSelf = titleLabelHeight + subtitleLabelHeight + (self.subtitleLabel.text == nil || self.titleLabel.text == nil ? kMargin*2.f : kMargin*2.5f);
+    //
     CFTimeInterval boundsAnimationDuration = AL_DEVICE_ANIMATION_DURATION;
-        
+    
     CGRect oldBounds = self.layer.bounds;
     CGRect newBounds = oldBounds;
     newBounds.size = CGSizeMake(self.superview.frame.size.width, heightForSelf);
@@ -603,8 +594,8 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     }
     
     self.styleImageView.frame = CGRectMake(kMargin, (self.frame.size.height/2.f) - (self.styleImageView.image.size.height/2.f), self.styleImageView.image.size.width, self.styleImageView.image.size.height);
-    self.titleLabel.frame = CGRectMake(self.styleImageView.frame.origin.x + self.styleImageView.frame.size.width + kMargin, kMargin, maxLabelSize.width, titleLabelHeight);
-    self.subtitleLabel.frame = CGRectMake(self.titleLabel.frame.origin.x, self.titleLabel.frame.origin.y + self.titleLabel.frame.size.height + (self.titleLabel.text == nil ? 0.f : kMargin/2.f), maxLabelSize.width, subtitleLabelHeight);
+    self.titleLabel.frame = CGRectMake(self.styleImageView.frame.origin.x + self.styleImageView.frame.size.width + kMargin, kMargin, maxLabelSize.width, titleLabelSize.height);
+    self.subtitleLabel.frame = CGRectMake(self.titleLabel.frame.origin.x, self.titleLabel.frame.origin.y + self.titleLabel.frame.size.height + (self.titleLabel.text == nil ? 0.f : kMargin/2.f), maxLabelSize.width, subtitleLabelSize.height);
     
     if (animated) {
         [UIView commitAnimations];
@@ -625,9 +616,9 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     }
 }
 
-- (void)updatePositionAfterRotationWithY:(CGFloat)yPos animated:(BOOL)animated {    
-    CFTimeInterval positionAnimationDuration = kRotationDurationIphone; 
-
+- (void)updatePositionAfterRotationWithY:(CGFloat)yPos animated:(BOOL)animated {
+    CFTimeInterval positionAnimationDuration = kRotationDurationIphone;
+    
     BOOL isAnimating = self.isAnimating;
     CALayer *activeLayer = isAnimating ? (CALayer *)self.layer.presentationLayer : self.layer;
     NSString *currentAnimationKey = nil;
@@ -646,14 +637,14 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
             currentAnimationKey = kMoveAlertBannerKey;
         } else
             return;
-
+        
         CFTimeInterval remainingAnimationDuration = currentAnimation.duration - (CACurrentMediaTime() - currentAnimation.beginTime);
         timingFunction = currentAnimation.timingFunction;
         positionAnimationDuration = remainingAnimationDuration;
         
         [self.layer removeAnimationForKey:currentAnimationKey];
     }
-
+    
     if (self.state == ALAlertBannerStateHiding || self.state == ALAlertBannerStateMovingBackward) {
         switch (self.position) {
             case ALAlertBannerPositionTop:
@@ -670,7 +661,7 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     CGPoint newPos = CGPointMake(oldPos.x, yPos);
     self.layer.position = newPos;
     
-    if (animated) {        
+    if (animated) {
         CABasicAnimation *positionAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
         positionAnimation.fromValue = [NSValue valueWithCGPoint:oldPos];
         positionAnimation.toValue = [NSValue valueWithCGPoint:newPos];
